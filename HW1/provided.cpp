@@ -6,6 +6,8 @@
 #include <iomanip>
 #include <cmath>
 #include <cstdlib>
+#include <stdio.h>
+#include <cstring>
 
 // ======================================================================================
 
@@ -69,32 +71,79 @@ void ReadFont(const std::string &font_file,
   }
 }
 
-int main()
+std::string replacechar(std::string input, std::string f, std::string bg)
 {
-	std::vector<std::vector<std::string> >temp;
+	std::string out="";
+  for(int i=0; i<input.length(); i++)
+  {
+    if(input[i] == '#')
+      out = out+f;
+    else
+     	out = out+bg;
+  }
+  return out;
+}
+
+int main(int argc, char* argv[])
+{
+  if(argc != 4 && argc != 6)
+  {
+    std::cerr << "Incorrect number of inputs" << std::endl;
+    return 1;
+  }
+  
+  //std::cout << "YES " << argv[1] << std::endl;
+  std::vector<std::vector<std::string> >temp;
 	int w=0, h=0;
-	ReadFont("simple_font.txt", w,h,temp);
+	ReadFont(argv[2],w,h,temp);
 	
-	std::vector<int>output;
-	std::string answerline="";
-	std::string input;
+	//display
+  if(std::strcmp(argv[1], "display") == 0)
+  {
+		std::vector<int>output;
+		std::string input = argv[3];
+		
+		for(int i=0; i<input.length(); i++)
+		  output.push_back(int(input[i]));
 	
-	std::cout << "Enter input" << std::endl;
-	std::cin >> input;
-	
-	for(int i=0; i<input.length(); i++)
-	{
-		int a = input[i];
-		output.push_back(a);
-	}
-	
-	for(int i=0; i<h; i++)
-	{
-		for(int k=0; k<output.size(); k++)
+		for(int i=0; i<h; i++)
 		{
-			std::cout << temp[output[k]][i] << ".";
+		  for(int k=0; k<output.size(); k++)
+			{
+				std::cout << replacechar(temp[output[k]][i], argv[4], argv[5]) << ".";
+			}
+	   std::cout << std::endl;
+	  }
+	}
+	//read
+	if(std::strcmp(argv[1], "read") == 0)
+	{
+		std::ifstream file;
+		file.open(argv[3]);
+		std::vector<std::string>filestuff;
+		std::string s;
+		std::vector<std::string>check;
+		
+		while(file >> s)
+			filestuff.push_back(s);
+		
+		//within each word
+		for(int j=0; j<filestuff[0]/w; j++)
+		{
+			//each word
+			for(int i=0; i<filestuff.size(); i++)
+			{
+				//each char
+				for(int k=0; k<w; k++)
+				{
+					//grab the part of the string that in the char
+					std::string t = filestuff[i].substr(j*w, j*w+w);
+					//create the vector that is the char
+					check.push_back(t);
+				}
+			}
 		}
-		std::cout << std::endl;
+		
 	}
 	
 	
